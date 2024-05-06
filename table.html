@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF File Uploader</title>
+<style>
+    /* Basic styling for sidebar and navbar */
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #333;
+        padding-top: 20px;
+        color: #fff;
+    }
+
+    #sidebar ul {
+        padding-left: 0;
+    }
+
+    #sidebar ul li {
+        list-style: none;
+        margin-bottom: 10px;
+    }
+
+    #sidebar ul li a {
+        color: #fff;
+        text-decoration: none;
+        display: block;
+        padding: 10px;
+        background-color: #555;
+        border-radius: 5px;
+    }
+
+    #sidebar ul li a:hover {
+        background-color: #777;
+    }
+
+    #content {
+        margin-left: 250px;
+        padding: 20px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+    <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+    </ul>
+</div>
+
+<!-- Navbar -->
+<nav id="navbar" style="background-color: #333; color: #fff; padding: 10px;">
+    <span style="font-size: 20px;">PDF File Uploader</span>
+</nav>
+
+<!-- Content -->
+<div id="content">
+    <h2>Upload PDF File</h2>
+    <div id="uploadButtons"></div>
+
+    <div id="pdfViewer" style="margin-top: 20px;">
+        <!-- PDFs will be displayed here -->
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Function to handle file upload
+    function handleFileUpload(file) {
+        if (file) {
+            // Display uploaded PDF
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var pdfViewer = document.getElementById('pdfViewer');
+                var embed = document.createElement('embed');
+                embed.src = e.target.result;
+                embed.width = '100%';
+                embed.height = '600px';
+                embed.type = 'application/pdf';
+                pdfViewer.appendChild(embed);
+
+                // Store PDF data in local storage
+                localStorage.setItem('uploadedPDF', pdfViewer.innerHTML);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please select a file.');
+        }
+    }
+
+    // Function to generate upload buttons
+    function generateUploadButtons(num) {
+        var uploadButtons = document.getElementById('uploadButtons');
+        for (var i = 1; i <= num; i++) {
+            var button = document.createElement('button');
+            button.textContent = 'Upload File ' + i;
+            button.className = 'upload-btn';
+            button.dataset.index = i;
+            button.addEventListener('click', function() {
+                document.getElementById('fileInput' + this.dataset.index).click();
+            });
+
+            var fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.id = 'fileInput' + i;
+            fileInput.accept = '.pdf';
+            fileInput.style.display = 'none';
+            fileInput.addEventListener('change', function() {
+                var files = this.files;
+                for (var j = 0; j < files.length; j++) {
+                    handleFileUpload(files[j]);
+                }
+            });
+
+            uploadButtons.appendChild(button);
+            uploadButtons.appendChild(fileInput);
+        }
+    }
+
+    // Generate 6 upload buttons
+    generateUploadButtons(6);
+
+    // Check if there's a PDF stored in local storage and display it
+    var storedPDF = localStorage.getItem('uploadedPDF');
+    if (storedPDF) {
+        var pdfViewer = document.getElementById('pdfViewer');
+        pdfViewer.innerHTML = storedPDF;
+    }
+</script>
+
+</body>
+</html>
